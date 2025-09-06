@@ -3,14 +3,24 @@
   <div class="main-header">
     <h2>Employee Data List</h2>
     <span class="icon-bar">
-      <mat-icon class="icon-action">cloud_download</mat-icon>
-      <mat-icon class="icon-action">cloud_upload</mat-icon>
-      <mat-icon class="icon-action">refresh</mat-icon>
-      <button mat-icon-button color="primary" aria-label="Add Employee" (click)="addEmployee()" class="add-employee-btn">
+      <mat-icon class="icon-action" (click)="exportToCSV()" matTooltip="Export to CSV" title="Export to CSV">cloud_download</mat-icon>
+      <mat-icon class="icon-action" (click)="importFromCSV()" matTooltip="Import from CSV" title="Import from CSV">cloud_upload</mat-icon>
+      <mat-icon class="icon-action" (click)="refreshData()" matTooltip="Refresh" title="Refresh">refresh</mat-icon>
+
+      <button mat-icon-button color="primary" aria-label="Add Employee" (click)="addEmployee()" class="add-employee-btn" matTooltip="Add Employee">
         <mat-icon>person_add</mat-icon>
       </button>
     </span>
   </div>
+  
+  <!-- Hidden file input for CSV import -->
+  <input 
+    #fileInput 
+    type="file" 
+    accept=".csv" 
+    (change)="onFileSelected($event)" 
+    style="display: none;"
+  />
   
   <mat-form-field class="search-box" appearance="fill">
     <mat-label>Search</mat-label>

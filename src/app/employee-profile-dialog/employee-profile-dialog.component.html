@@ -8,8 +8,11 @@
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Name *</mat-label>
           <input matInput placeholder="Enter full name" formControlName="name" />
-          <mat-error *ngIf="personalForm.get('name')?.hasError('required')">
+          <mat-error *ngIf="personalForm.get('name')?.hasError('required') && personalForm.get('name')?.touched">
             Name is required
+          </mat-error>
+          <mat-error *ngIf="personalForm.get('name')?.hasError('minlength') && personalForm.get('name')?.touched">
+            Name must be at least 2 characters long
           </mat-error>
         </mat-form-field>
 
@@ -20,7 +23,7 @@
             <mat-option value="Female">Female</mat-option>
             <mat-option value="Other">Other</mat-option>
           </mat-select>
-          <mat-error *ngIf="personalForm.get('gender')?.hasError('required')">
+          <mat-error *ngIf="personalForm.get('gender')?.hasError('required') && personalForm.get('gender')?.touched">
             Gender is required
           </mat-error>
         </mat-form-field>
@@ -31,7 +34,7 @@
                  formControlName="dob" (dateChange)="onDOBChange($event)" />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="personalForm.get('dob')?.hasError('required')">
+          <mat-error *ngIf="personalForm.get('dob')?.hasError('required') && personalForm.get('dob')?.touched">
             Date of birth is required
           </mat-error>
         </mat-form-field>
@@ -44,27 +47,33 @@
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Address *</mat-label>
           <input matInput placeholder="Enter address" formControlName="address" />
-          <mat-error *ngIf="personalForm.get('address')?.hasError('required')">
+          <mat-error *ngIf="personalForm.get('address')?.hasError('required') && personalForm.get('address')?.touched">
             Address is required
+          </mat-error>
+          <mat-error *ngIf="personalForm.get('address')?.hasError('minlength') && personalForm.get('address')?.touched">
+            Address must be at least 10 characters long
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Contact Number *</mat-label>
-          <input matInput placeholder="Enter contact number" formControlName="contactNumber" />
-          <mat-error *ngIf="personalForm.get('contactNumber')?.hasError('required')">
+          <input matInput placeholder="Enter 10-digit contact number" formControlName="contactNumber" />
+          <mat-error *ngIf="personalForm.get('contactNumber')?.hasError('required') && personalForm.get('contactNumber')?.touched">
             Contact number is required
+          </mat-error>
+          <mat-error *ngIf="personalForm.get('contactNumber')?.hasError('pattern') && personalForm.get('contactNumber')?.touched">
+            Please enter a valid 10-digit phone number
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Email *</mat-label>
           <input matInput placeholder="Enter email address" formControlName="email" type="email" />
-          <mat-error *ngIf="personalForm.get('email')?.hasError('required')">
+          <mat-error *ngIf="personalForm.get('email')?.hasError('required') && personalForm.get('email')?.touched">
             Email is required
           </mat-error>
-          <mat-error *ngIf="personalForm.get('email')?.hasError('email')">
-            Please enter a valid email
+          <mat-error *ngIf="personalForm.get('email')?.hasError('email') && personalForm.get('email')?.touched">
+            Please enter a valid email address
           </mat-error>
         </mat-form-field>
 
@@ -76,10 +85,13 @@
               <mat-icon>person</mat-icon>
             </div>
           </div>
-          <button mat-fab color="primary" (click)="fileInput.click()" type="button" class="upload-btn">
-            <mat-icon>attach_file</mat-icon>
+          <button mat-fab color="primary" (click)="avatarFileInput.click()" type="button" class="upload-btn">
+            <mat-icon>camera_alt</mat-icon>
           </button>
-          <input #fileInput type="file" (change)="onFileSelected($event)" hidden accept="image/*"/>
+          <input #avatarFileInput type="file" (change)="onAvatarSelected($event)" hidden accept="image/*"/>
+          <button *ngIf="imagePreview" mat-mini-fab color="warn" (click)="removeAvatar()" type="button" class="remove-btn">
+            <mat-icon>delete</mat-icon>
+          </button>
         </div>
 
         <div class="tab-actions">
@@ -96,46 +108,156 @@
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Designation *</mat-label>
           <input matInput placeholder="Enter designation" formControlName="designation" />
-          <mat-error *ngIf="professionalForm.get('designation')?.hasError('required')">
+          <mat-error *ngIf="professionalForm.get('designation')?.hasError('required') && professionalForm.get('designation')?.touched">
             Designation is required
+          </mat-error>
+          <mat-error *ngIf="professionalForm.get('designation')?.hasError('minlength') && professionalForm.get('designation')?.touched">
+            Designation must be at least 2 characters long
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Department *</mat-label>
           <input matInput placeholder="Enter department" formControlName="department" />
-          <mat-error *ngIf="professionalForm.get('department')?.hasError('required')">
+          <mat-error *ngIf="professionalForm.get('department')?.hasError('required') && professionalForm.get('department')?.touched">
             Department is required
           </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Joining Date *</mat-label>
-          <input matInput [matDatepicker]="joiningPicker" placeholder="MM/DD/YYYY" 
-                 formControlName="joiningDate" />
-          <mat-datepicker-toggle matSuffix [for]="joiningPicker"></mat-datepicker-toggle>
-          <mat-datepicker #joiningPicker></mat-datepicker>
-          <mat-error *ngIf="professionalForm.get('joiningDate')?.hasError('required')">
-            Joining date is required
+          <mat-error *ngIf="professionalForm.get('department')?.hasError('minlength') && professionalForm.get('department')?.touched">
+            Department must be at least 2 characters long
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Salary *</mat-label>
-          <input matInput placeholder="Enter salary" formControlName="salary" type="number" />
-          <mat-error *ngIf="professionalForm.get('salary')?.hasError('required')">
-            Salary is required
+          <mat-label>Qualification *</mat-label>
+          <input matInput placeholder="Enter highest qualification" formControlName="qualification" />
+          <mat-error *ngIf="professionalForm.get('qualification')?.hasError('required') && professionalForm.get('qualification')?.touched">
+            Qualification is required
           </mat-error>
-          <mat-error *ngIf="professionalForm.get('salary')?.hasError('min')">
-            Salary must be greater than 0
+          <mat-error *ngIf="professionalForm.get('qualification')?.hasError('minlength') && professionalForm.get('qualification')?.touched">
+            Qualification must be at least 2 characters long
           </mat-error>
         </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Experience (Years) *</mat-label>
+          <input matInput placeholder="Enter years of experience" formControlName="experience" type="number" min="0" step="0.5" />
+          <mat-error *ngIf="professionalForm.get('experience')?.hasError('required') && professionalForm.get('experience')?.touched">
+            Experience is required
+          </mat-error>
+          <mat-error *ngIf="professionalForm.get('experience')?.hasError('min') && professionalForm.get('experience')?.touched">
+            Experience must be 0 or greater
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Skills *</mat-label>
+          <textarea matInput placeholder="Enter skills separated by commas" formControlName="skills" rows="3"></textarea>
+          <mat-error *ngIf="professionalForm.get('skills')?.hasError('required') && professionalForm.get('skills')?.touched">
+            Skills are required
+          </mat-error>
+          <mat-error *ngIf="professionalForm.get('skills')?.hasError('minlength') && professionalForm.get('skills')?.touched">
+            Skills must be at least 3 characters long
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Profile Document Upload Section -->
+        <div class="document-upload-section">
+          <h3>Profile Document</h3>
+          
+          <!-- Document Upload for Add Mode OR Edit Mode without existing document -->
+          <div *ngIf="!profileDocument" class="document-upload">
+            <button mat-stroked-button color="primary" (click)="documentFileInput.click()" type="button">
+              <mat-icon>attach_file</mat-icon>
+              Upload Profile Document
+            </button>
+            <input #documentFileInput type="file" (change)="onDocumentSelected($event)" 
+                   hidden accept=".pdf,.doc,.docx"/>
+            <div *ngIf="selectedDocumentName" class="selected-document">
+              <mat-icon>description</mat-icon>
+              <span>{{ selectedDocumentName }}</span>
+              <div class="document-preview-actions">
+                <button mat-icon-button (click)="previewSelectedDocument()" 
+                        matTooltip="Preview Document" type="button" color="primary">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button (click)="downloadSelectedDocument()" 
+                        matTooltip="Download Document" type="button" color="primary">
+                  <mat-icon>download</mat-icon>
+                </button>
+                <button mat-icon-button (click)="removeSelectedDocument()" 
+                        matTooltip="Remove Document" type="button" color="warn">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Display for Edit Mode with existing document -->
+          <div *ngIf="profileDocument" class="existing-document">
+            <div class="document-info">
+              <mat-icon>description</mat-icon>
+              <span>{{ profileDocument.name }}</span>
+              <div class="document-actions">
+                <button mat-icon-button (click)="downloadDocument()" 
+                        matTooltip="Download Document" type="button" color="primary">
+                  <mat-icon>download</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteDocument()" 
+                        matTooltip="Delete Document" type="button">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Option to upload new document -->
+            <button mat-stroked-button color="primary" (click)="documentFileInput.click()" 
+                    type="button" class="upload-new-btn">
+              <mat-icon>swap_horiz</mat-icon>
+              Replace Document
+            </button>
+            <input #documentFileInput type="file" (change)="onDocumentSelected($event)" 
+                   hidden accept=".pdf,.doc,.docx"/>
+            
+            <!-- Show newly selected document for replacement -->
+            <div *ngIf="selectedDocumentName" class="selected-document replacement">
+              <mat-icon>description</mat-icon>
+              <span>New: {{ selectedDocumentName }}</span>
+              <div class="document-preview-actions">
+                <button mat-icon-button (click)="previewSelectedDocument()" 
+                        matTooltip="Preview New Document" type="button" color="primary">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button (click)="downloadSelectedDocument()" 
+                        matTooltip="Download New Document" type="button" color="primary">
+                  <mat-icon>download</mat-icon>
+                </button>
+                <button mat-icon-button (click)="removeSelectedDocument()" 
+                        matTooltip="Remove New Document" type="button" color="warn">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Demo Section - Only for testing purposes -->
+          <div *ngIf="!isEditMode" class="demo-section">
+            <p class="demo-text">
+              <mat-icon>info</mat-icon>
+              <small>After uploading a document, you'll see download and preview options above.</small>
+            </p>
+            <button mat-button color="accent" (click)="simulateEditMode()" type="button">
+              <mat-icon>visibility</mat-icon>
+              Preview Edit Mode (Demo)
+            </button>
+          </div>
+        </div>
 
         <div class="tab-actions">
           <button mat-raised-button type="button" (click)="previousTab()">
             Previous
           </button>
-          <button mat-raised-button color="primary" type="button" (click)="onSave()">
+          <button mat-raised-button color="primary" type="button" (click)="onSave()"
+                  [disabled]="!personalForm.valid || !professionalForm.valid">
             {{ isEditMode ? 'Update' : 'Save' }}
           </button>
         </div>

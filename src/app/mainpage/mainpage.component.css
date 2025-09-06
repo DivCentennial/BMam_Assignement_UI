@@ -29,10 +29,13 @@
   color: #666;
   cursor: pointer;
   transition: color 0.2s;
+  padding: 8px;
+  border-radius: 4px;
 }
 
 .icon-action:hover {
   color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.1);
 }
 
 .add-employee-btn {
@@ -130,10 +133,31 @@
   font-size: 16px;
 }
 
-/* Success snackbar styling */
+/* Success and Error snackbar styling */
 ::ng-deep .success-snackbar {
   background-color: #4caf50 !important;
   color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+/* Import/Export icon styling */
+.icon-action[title="Export to CSV"]:hover {
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.icon-action[title="Import from CSV"]:hover {
+  color: #ff9800;
+  background-color: rgba(255, 152, 0, 0.1);
+}
+
+.icon-action[title="Refresh"]:hover {
+  color: #2196f3;
+  background-color: rgba(33, 150, 243, 0.1);
 }
 
 /* Responsive design */
@@ -150,6 +174,7 @@
   
   .icon-bar {
     align-self: flex-end;
+    gap: 12px;
   }
   
   .employee-cell {
@@ -173,5 +198,13 @@
   .employee-avatar-placeholder {
     width: 32px;
     height: 32px;
+  }
+  
+  .icon-bar {
+    gap: 8px;
+  }
+  
+  .icon-action {
+    padding: 6px;
   }
 }

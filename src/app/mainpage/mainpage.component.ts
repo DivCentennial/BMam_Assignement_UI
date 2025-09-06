@@ -1,5 +1,5 @@
 // mainpage.component.ts
-import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit, ElementRef } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { EmployeeProfileDialogComponent, Employee } from '../employee-profile-dialog/employee-profile-dialog.component';
 
-// Updated interface to match dialog interface
+// Updated interface to match the new dialog interface
 interface TableEmployee {
   id?: number;
   name: string;
@@ -26,8 +26,9 @@ interface TableEmployee {
   age?: number;
   address?: string;
   contactNumber?: string;
-  joiningDate?: Date | null;
-  salary?: number;
+  qualification?: string;
+  experience?: number;
+  skills?: string;
   avatar?: string;
 }
 
@@ -62,7 +63,10 @@ export class MainpageComponent implements AfterViewInit, OnInit {
       department: 'ADAD', 
       contact: '1234567890', 
       email: 'sre@gmail.com',
-      contactNumber: '1234567890'
+      contactNumber: '1234567890',
+      qualification: 'B.Tech',
+      experience: 2,
+      skills: 'JavaScript, Angular'
     },
     { 
       id: 2,
@@ -71,7 +75,10 @@ export class MainpageComponent implements AfterViewInit, OnInit {
       department: 'Database', 
       contact: '3434534', 
       email: 'arun.t@mariapps.com',
-      contactNumber: '3434534'
+      contactNumber: '3434534',
+      qualification: 'M.Tech',
+      experience: 8,
+      skills: 'SQL, Oracle, MongoDB'
     },
     { 
       id: 3,
@@ -80,7 +87,10 @@ export class MainpageComponent implements AfterViewInit, OnInit {
       department: 'IT', 
       contact: '9089783643', 
       email: 'dijin.augustine@mariapps.com',
-      contactNumber: '9089783643'
+      contactNumber: '9089783643',
+      qualification: 'B.E',
+      experience: 10,
+      skills: 'System Architecture, Cloud Computing, AWS'
     },
     { 
       id: 4,
@@ -89,7 +99,10 @@ export class MainpageComponent implements AfterViewInit, OnInit {
       department: 'Development', 
       contact: '344546456', 
       email: 'Ezhaisavallaban@mariapps.com',
-      contactNumber: '344546456'
+      contactNumber: '344546456',
+      qualification: 'MCA',
+      experience: 6,
+      skills: 'Java, Spring Boot, Microservices'
     },
     { 
       id: 5,
@@ -98,7 +111,10 @@ export class MainpageComponent implements AfterViewInit, OnInit {
       department: 'Development', 
       contact: '6000050000', 
       email: 'joseph.alex@mariapps.com',
-      contactNumber: '6000050000'
+      contactNumber: '6000050000',
+      qualification: 'B.Tech',
+      experience: 3,
+      skills: 'React, Node.js, Python'
     },
     { 
       id: 6,
@@ -107,13 +123,17 @@ export class MainpageComponent implements AfterViewInit, OnInit {
       department: 'IT', 
       contact: '9999999990', 
       email: 'sreyas.narayanan@mariapps.com',
-      contactNumber: '9999999990'
+      contactNumber: '9999999990',
+      qualification: 'B.Tech',
+      experience: 12,
+      skills: 'Team Management, DevOps, Kubernetes'
     }
   ];
   
   dataSource = new MatTableDataSource<TableEmployee>(this.employees);
   
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private snackBar: MatSnackBar,
@@ -126,7 +146,9 @@ export class MainpageComponent implements AfterViewInit, OnInit {
              data.designation.toLowerCase().includes(searchTerm) ||
              data.department.toLowerCase().includes(searchTerm) ||
              data.contact.toLowerCase().includes(searchTerm) ||
-             data.email.toLowerCase().includes(searchTerm);
+             data.email.toLowerCase().includes(searchTerm) ||
+             (data.qualification?.toLowerCase().includes(searchTerm) || false) ||
+             (data.skills?.toLowerCase().includes(searchTerm) || false);
     };
   }
 
@@ -142,6 +164,230 @@ export class MainpageComponent implements AfterViewInit, OnInit {
   setupSearch() {
     // You can implement real-time search here if needed
     // For now, we'll use the applyFilter method
+  }
+
+  // Export employees to CSV
+  exportToCSV() {
+    if (this.employees.length === 0) {
+      this.snackBar.open('No data to export!', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+
+    // Define CSV headers
+    const csvHeaders = [
+      'ID',
+      'Name',
+      'Gender',
+      'Date of Birth',
+      'Age',
+      'Address',
+      'Contact Number',
+      'Email',
+      'Designation',
+      'Department',
+      'Qualification',
+      'Experience',
+      'Skills'
+    ];
+
+    // Convert employee data to CSV format
+    const csvData = this.employees.map(emp => [
+      emp.id || '',
+      emp.name || '',
+      emp.gender || '',
+      emp.dob ? this.formatDate(emp.dob) : '',
+      emp.age || '',
+      emp.address || '',
+      emp.contactNumber || emp.contact || '',
+      emp.email || '',
+      emp.designation || '',
+      emp.department || '',
+      emp.qualification || '',
+      emp.experience || '',
+      emp.skills || ''
+    ]);
+
+    // Combine headers with data
+    const csvContent = [csvHeaders, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `employees_${this.getCurrentDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    this.snackBar.open('Employee data exported successfully!', 'Close', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  }
+
+  // Trigger file input for CSV import
+  importFromCSV() {
+    this.fileInput.nativeElement.click();
+  }
+
+  // Handle file selection and import
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && file.type === 'text/csv') {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.parseCSV(e.target.result);
+      };
+      reader.readAsText(file);
+    } else {
+      this.snackBar.open('Please select a valid CSV file!', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    }
+    // Reset file input
+    event.target.value = '';
+  }
+
+  // Parse CSV content and import employees
+  private parseCSV(csvContent: string) {
+    try {
+      const lines = csvContent.split('\n').filter(line => line.trim() !== '');
+      if (lines.length < 2) {
+        this.snackBar.open('CSV file is empty or invalid!', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        return;
+      }
+
+      // Skip header row
+      const dataLines = lines.slice(1);
+      let importedCount = 0;
+      let errorCount = 0;
+
+      dataLines.forEach((line, index) => {
+        try {
+          const columns = this.parseCSVLine(line);
+          if (columns.length >= 13) {
+            // Generate new ID
+            const newId = Math.max(...this.employees.map(e => e.id || 0)) + 1;
+            
+            const newEmployee: TableEmployee = {
+              id: newId,
+              name: columns[1] || '',
+              gender: columns[2] || '',
+              dob: columns[3] ? this.parseDate(columns[3]) : null,
+              age: columns[4] ? parseInt(columns[4]) : undefined,
+              address: columns[5] || '',
+              contactNumber: columns[6] || '',
+              contact: columns[6] || '',
+              email: columns[7] || '',
+              designation: columns[8] || '',
+              department: columns[9] || '',
+              qualification: columns[10] || '',
+              experience: columns[11] ? parseInt(columns[11]) : undefined,
+              skills: columns[12] || ''
+            };
+
+            // Basic validation
+            if (newEmployee.name && newEmployee.email) {
+              // Check if employee with same email already exists
+              const existingEmployee = this.employees.find(emp => 
+                emp.email.toLowerCase() === newEmployee.email.toLowerCase()
+              );
+              
+              if (!existingEmployee) {
+                this.employees.push(newEmployee);
+                importedCount++;
+              } else {
+                errorCount++;
+              }
+            } else {
+              errorCount++;
+            }
+          } else {
+            errorCount++;
+          }
+        } catch (error) {
+          errorCount++;
+        }
+      });
+
+      // Refresh the data source
+      this.dataSource.data = [...this.employees];
+
+      // Show import results
+      if (importedCount > 0) {
+        this.snackBar.open(
+          `Successfully imported ${importedCount} employee(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}!`, 
+          'Close', 
+          {
+            duration: 5000,
+            panelClass: ['success-snackbar']
+          }
+        );
+      } else {
+        this.snackBar.open('No new employees were imported!', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
+    } catch (error) {
+      this.snackBar.open('Error parsing CSV file!', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    }
+  }
+
+  // Parse CSV line handling quoted fields
+  private parseCSVLine(line: string): string[] {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    result.push(current.trim());
+    return result;
+  }
+
+  // Helper function to format date for CSV
+  private formatDate(date: Date): string {
+    if (!date) return '';
+    return date.toISOString().split('T')[0];
+  }
+
+  // Helper function to parse date from CSV
+  private parseDate(dateStr: string): Date | null {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  // Helper function to get current date string for filename
+  private getCurrentDateString(): string {
+    const now = new Date();
+    return now.toISOString().split('T')[0];
   }
 
   addEmployee() {
@@ -171,8 +417,9 @@ export class MainpageComponent implements AfterViewInit, OnInit {
           dob: result.dob,
           age: result.age,
           address: result.address,
-          joiningDate: result.joiningDate,
-          salary: result.salary,
+          qualification: result.qualification,
+          experience: result.experience,
+          skills: result.skills,
           avatar: result.avatar
         };
 
@@ -191,69 +438,68 @@ export class MainpageComponent implements AfterViewInit, OnInit {
     });
   }
 
-  editEmployee(employee: TableEmployee) {
-    // Convert TableEmployee to Employee format for the dialog
-    const employeeData: Employee = {
-      id: employee.id,
-      name: employee.name,
-      gender: employee.gender || '',
-      dob: employee.dob || null,
-      age: employee.age || 0,
-      address: employee.address || '',
-      contactNumber: employee.contactNumber || employee.contact,
-      email: employee.email,
-      designation: employee.designation,
-      department: employee.department,
-      joiningDate: employee.joiningDate || null,
-      salary: employee.salary || 0,
-      avatar: employee.avatar
-    };
+ editEmployee(employee: TableEmployee) {
+  const employeeData: Employee = {
+    id: employee.id,
+    name: employee.name,
+    gender: employee.gender || '',
+    dob: employee.dob || null,
+    age: employee.age || 0,
+    address: employee.address || '',
+    contactNumber: employee.contactNumber || employee.contact,
+    email: employee.email,
+    designation: employee.designation,
+    department: employee.department,
+    qualification: employee.qualification || '',
+    experience: employee.experience || 0,
+    skills: employee.skills || '',
+    avatar: employee.avatar
+  };
 
-    const dialogRef = this.dialog.open(EmployeeProfileDialogComponent, {
-      width: '700px',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      disableClose: true,
-      data: employeeData // pass employee data for edit mode
-    });
+  const dialogRef = this.dialog.open(EmployeeProfileDialogComponent, {
+    width: '700px',
+    maxWidth: '90vw',
+    maxHeight: '90vh',
+    disableClose: true,
+    data: employeeData
+  });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Find and update the employee
-        const index = this.employees.findIndex(e => e.id === employee.id);
-        if (index > -1) {
-          // Update the employee data
-          const updatedEmployee: TableEmployee = {
-            ...this.employees[index],
-            name: result.name,
-            designation: result.designation,
-            department: result.department,
-            contact: result.contactNumber,
-            email: result.email,
-            contactNumber: result.contactNumber,
-            gender: result.gender,
-            dob: result.dob,
-            age: result.age,
-            address: result.address,
-            joiningDate: result.joiningDate,
-            salary: result.salary,
-            avatar: result.avatar
-          };
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      const index = this.employees.findIndex(e => e.id === employee.id);
+      if (index > -1) {
+        const updatedEmployee: TableEmployee = {
+          ...this.employees[index],
+          name: result.name,
+          designation: result.designation,
+          department: result.department,
+          contact: result.contactNumber,
+          email: result.email,
+          contactNumber: result.contactNumber,
+          gender: result.gender,
+          dob: result.dob,
+          age: result.age,
+          address: result.address,
+          qualification: result.qualification,
+          experience: result.experience,
+          skills: result.skills,
+          avatar: result.avatar
+        };
 
-          this.employees[index] = updatedEmployee;
-          
-          // Refresh the data source
-          this.dataSource.data = [...this.employees];
-          
-          // Show success message
-          this.snackBar.open('Employee updated successfully!', 'Close', { 
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
-        }
+        this.employees[index] = updatedEmployee;
+        this.refreshData(); // 👈 Call the correctly defined method
+        this.snackBar.open('Employee updated successfully!', 'Close', { 
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
       }
-    });
-  }
+    }
+  });
+}
+
+refreshData() {
+  this.dataSource.data = [...this.employees];
+}
 
   // Method to handle search filtering
   applyFilter() {
