@@ -1,0 +1,149 @@
+<!-- employee-profile-dialog.component.html -->
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Employee' : 'Add Employee' }} Profile</h2>
+<mat-dialog-content>
+  <mat-tab-group [(selectedIndex)]="selectedTab">
+    <!-- Personal Tab -->
+    <mat-tab label="Personal">
+      <form [formGroup]="personalForm" class="tab-form">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Name *</mat-label>
+          <input matInput placeholder="Enter full name" formControlName="name" />
+          <mat-error *ngIf="personalForm.get('name')?.hasError('required')">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Gender *</mat-label>
+          <mat-select formControlName="gender">
+            <mat-option value="Male">Male</mat-option>
+            <mat-option value="Female">Female</mat-option>
+            <mat-option value="Other">Other</mat-option>
+          </mat-select>
+          <mat-error *ngIf="personalForm.get('gender')?.hasError('required')">
+            Gender is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Date of Birth *</mat-label>
+          <input matInput [matDatepicker]="picker" placeholder="MM/DD/YYYY" 
+                 formControlName="dob" (dateChange)="onDOBChange($event)" />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="personalForm.get('dob')?.hasError('required')">
+            Date of birth is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Age</mat-label>
+          <input matInput placeholder="Calculated automatically" formControlName="age" readonly />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Address *</mat-label>
+          <input matInput placeholder="Enter address" formControlName="address" />
+          <mat-error *ngIf="personalForm.get('address')?.hasError('required')">
+            Address is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Contact Number *</mat-label>
+          <input matInput placeholder="Enter contact number" formControlName="contactNumber" />
+          <mat-error *ngIf="personalForm.get('contactNumber')?.hasError('required')">
+            Contact number is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Email *</mat-label>
+          <input matInput placeholder="Enter email address" formControlName="email" type="email" />
+          <mat-error *ngIf="personalForm.get('email')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="personalForm.get('email')?.hasError('email')">
+            Please enter a valid email
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Avatar upload -->
+        <div class="avatar-upload">
+          <div class="avatar-preview">
+            <img *ngIf="imagePreview" [src]="imagePreview" class="avatar-img" alt="Employee Avatar" />
+            <div *ngIf="!imagePreview" class="avatar-placeholder">
+              <mat-icon>person</mat-icon>
+            </div>
+          </div>
+          <button mat-fab color="primary" (click)="fileInput.click()" type="button" class="upload-btn">
+            <mat-icon>attach_file</mat-icon>
+          </button>
+          <input #fileInput type="file" (change)="onFileSelected($event)" hidden accept="image/*"/>
+        </div>
+
+        <div class="tab-actions">
+          <button mat-raised-button color="primary" type="button" (click)="nextTab()">
+            Next
+          </button>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Professional Tab -->
+    <mat-tab label="Professional">
+      <form [formGroup]="professionalForm" class="tab-form">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Designation *</mat-label>
+          <input matInput placeholder="Enter designation" formControlName="designation" />
+          <mat-error *ngIf="professionalForm.get('designation')?.hasError('required')">
+            Designation is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Department *</mat-label>
+          <input matInput placeholder="Enter department" formControlName="department" />
+          <mat-error *ngIf="professionalForm.get('department')?.hasError('required')">
+            Department is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Joining Date *</mat-label>
+          <input matInput [matDatepicker]="joiningPicker" placeholder="MM/DD/YYYY" 
+                 formControlName="joiningDate" />
+          <mat-datepicker-toggle matSuffix [for]="joiningPicker"></mat-datepicker-toggle>
+          <mat-datepicker #joiningPicker></mat-datepicker>
+          <mat-error *ngIf="professionalForm.get('joiningDate')?.hasError('required')">
+            Joining date is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Salary *</mat-label>
+          <input matInput placeholder="Enter salary" formControlName="salary" type="number" />
+          <mat-error *ngIf="professionalForm.get('salary')?.hasError('required')">
+            Salary is required
+          </mat-error>
+          <mat-error *ngIf="professionalForm.get('salary')?.hasError('min')">
+            Salary must be greater than 0
+          </mat-error>
+        </mat-form-field>
+
+        <div class="tab-actions">
+          <button mat-raised-button type="button" (click)="previousTab()">
+            Previous
+          </button>
+          <button mat-raised-button color="primary" type="button" (click)="onSave()">
+            {{ isEditMode ? 'Update' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+</mat-dialog-actions>

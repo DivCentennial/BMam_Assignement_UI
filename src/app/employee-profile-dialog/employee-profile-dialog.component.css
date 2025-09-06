@@ -1,0 +1,130 @@
+/* employee-profile-dialog.component.css */
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.tab-form {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.professional-tab-content {
+  display: flex;
+  position: relative;
+  min-height: 400px;
+}
+
+.professional-file-upload {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+  padding: 20px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.avatar-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e0e0e0;
+}
+
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.avatar-placeholder mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.upload-btn {
+  width: 56px;
+  height: 56px;
+}
+
+.tab-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.tab-actions button {
+  min-width: 100px;
+}
+
+mat-dialog-content {
+  max-height: 600px;
+  width: 500px;
+  padding: 0;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  mat-dialog-content {
+    width: 300px;
+    max-height: 500px;
+  }
+  
+  .tab-form {
+    padding: 16px;
+  }
+  
+  .avatar-upload {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Custom tab styling */
+::ng-deep .mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #1976d2;
+}
+
+::ng-deep .mat-mdc-tab {
+  min-width: 120px;
+}
+
+/* Error message styling */
+mat-error {
+  font-size: 12px;
+  margin-top: 4px;
+}

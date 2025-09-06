@@ -1,0 +1,46 @@
+<div class="login-container">
+  <div class="login-box">
+    <h2 class="login-title">Employee Database</h2>
+    <div class="subtitle">Sign in to start your session</div>
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        name="username"
+        type="text"
+        placeholder="Enter Username"
+        [(ngModel)]="username"
+        #usernameInput="ngModel"
+        required
+        (ngModelChange)="onInputChange()"
+      />
+      <div class="error" *ngIf="usernameInput.invalid && usernameInput.touched">
+        Username is required.
+      </div>
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        placeholder="Enter Password"
+        [(ngModel)]="password"
+        #passwordInput="ngModel"
+        required
+        (ngModelChange)="onInputChange()"
+      />
+      <div class="error" *ngIf="passwordInput.invalid && passwordInput.touched">
+        Password is required.
+      </div>
+
+      <button
+        type="submit"
+        class="login-btn"
+        [disabled]="!loginForm.form.valid"
+        [class.disabled]="!loginForm.form.valid"
+      >
+        Sign In
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<!-- mainpage.component.html -->
+<div class="main-container">
+  <div class="main-header">
+    <h2>Employee Data List</h2>
+    <span class="icon-bar">
+      <mat-icon class="icon-action">cloud_download</mat-icon>
+      <mat-icon class="icon-action">cloud_upload</mat-icon>
+      <mat-icon class="icon-action">refresh</mat-icon>
+      <button mat-icon-button color="primary" aria-label="Add Employee" (click)="addEmployee()" class="add-employee-btn">
+        <mat-icon>person_add</mat-icon>
+      </button>
+    </span>
+  </div>
+  
+  <mat-form-field class="search-box" appearance="fill">
+    <mat-label>Search</mat-label>
+    <input matInput placeholder="Search employees..." [(ngModel)]="searchText" (input)="applyFilter()" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+  
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee Name </th>
+        <td mat-cell *matCellDef="let emp"> 
+          <div class="employee-cell">
+            <img *ngIf="emp.avatar" [src]="emp.avatar" class="employee-avatar" alt="Avatar" />
+            <div *ngIf="!emp.avatar" class="employee-avatar-placeholder">
+              <mat-icon>person</mat-icon>
+            </div>
+            <span class="employee-name">{{ emp.name }}</span>
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Designation Column -->
+      <ng-container matColumnDef="designation">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Designation </th>
+        <td mat-cell *matCellDef="let emp"> {{ emp.designation }} </td>
+      </ng-container>
+      
+      <!-- Department Column -->
+      <ng-container matColumnDef="department">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Department </th>
+        <td mat-cell *matCellDef="let emp"> {{ emp.department }} </td>
+      </ng-container>
+      
+      <!-- Contact Column -->
+      <ng-container matColumnDef="contact">
+        <th mat-header-cell *matHeaderCellDef> Contact number </th>
+        <td mat-cell *matCellDef="let emp"> {{ emp.contact }} </td>
+      </ng-container>
+      
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+        <td mat-cell *matCellDef="let emp"> {{ emp.email }} </td>
+      </ng-container>
+      
+      <!-- Edit/Delete Column -->
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let emp">
+          <button mat-icon-button color="primary" (click)="editEmployee(emp)" matTooltip="Edit Employee">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteEmployee(emp)" matTooltip="Delete Employee">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      
+      <!-- Header and Row Definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns" class="employee-row"></tr>
+    </table>
+    
+    <!-- No data message -->
+    <div *ngIf="dataSource.filteredData.length === 0" class="no-data">
+      <mat-icon>info</mat-icon>
+      <p>No employees found</p>
+    </div>
+  </div>
+</div>

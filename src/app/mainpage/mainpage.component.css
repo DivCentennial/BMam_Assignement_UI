@@ -1,0 +1,177 @@
+/* mainpage.component.css */
+.main-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.main-header h2 {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.icon-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-action {
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.icon-action:hover {
+  color: #1976d2;
+}
+
+.add-employee-btn {
+  background-color: #1976d2;
+  color: white;
+}
+
+.add-employee-btn:hover {
+  background-color: #1565c0;
+}
+
+.search-box {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mat-mdc-table {
+  width: 100%;
+}
+
+.employee-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.employee-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+}
+
+.employee-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e0e0e0;
+}
+
+.employee-avatar-placeholder mat-icon {
+  color: #999;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.employee-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.employee-row {
+  transition: background-color 0.2s;
+}
+
+.employee-row:hover {
+  background-color: #f8f9fa;
+}
+
+.mat-mdc-header-cell {
+  font-weight: 600;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+.no-data {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  color: #999;
+}
+
+.no-data p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Success snackbar styling */
+::ng-deep .success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-container {
+    padding: 10px;
+  }
+  
+  .main-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .icon-bar {
+    align-self: flex-end;
+  }
+  
+  .employee-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .mat-mdc-table {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mat-mdc-header-cell,
+  .mat-mdc-cell {
+    padding: 8px 4px;
+  }
+  
+  .employee-avatar,
+  .employee-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+  }
+}
