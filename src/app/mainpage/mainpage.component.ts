@@ -12,6 +12,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { EmployeeProfileDialogComponent, Employee } from '../employee-profile-dialog/employee-profile-dialog.component';
+import { EmployeeService } from '../services/employee.service';
+import { EmployeePersonal } from '../models/extraction-detail.model.interface';
 
 // Updated interface to match the new dialog interface
 interface TableEmployee {
@@ -137,7 +139,8 @@ export class MainpageComponent implements AfterViewInit, OnInit {
 
   constructor(
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public readonly employeeService: EmployeeService
   ) {
     // Set up the filter predicate for search functionality
     this.dataSource.filterPredicate = (data: TableEmployee, filter: string) => {
@@ -155,6 +158,52 @@ export class MainpageComponent implements AfterViewInit, OnInit {
   ngOnInit() {
     // Set up real-time search
     this.setupSearch();
+    // Load employee data from backend
+    this.loadData();
+  }
+
+  public loadData(): void {
+    this.employeeService.getEmployees().subscribe({
+      next: (data: EmployeePersonal[]) => {
+        console.log('Employee data loaded:', data);
+        // Convert backend data to table format
+        this.employees = data.map((emp: EmployeePersonal) => ({
+          id: emp.employeeId,
+          name: emp.fullName,
+          designation: '', // Will be filled from professional data later
+          department: '',
+          contact: emp.contactNo,
+          email: emp.email || '',
+          gender: emp.gender,
+          dob: emp.dob ? new Date(emp.dob) : null,
+          age: emp.age,
+          address: emp.address,
+          contactNumber: emp.contactNo,
+          qualification: '',
+          experience: undefined,
+          skills: '',
+          avatar: emp.profileImageUrl || undefined
+        }));
+        
+        // Update the data source
+        this.dataSource.data = [...this.employees];
+        
+        // Show success message
+        this.snackBar.open(`Loaded ${this.employees.length} employees from server`, 'Close', {
+          duration: 2000,
+          panelClass: ['success-snackbar']
+        });
+      },
+      error: (error) => {
+        console.error('Failed to load employee data:', error);
+        this.snackBar.open('Failed to load employees from server. Using local data.', 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+        // Keep existing local data if backend fails
+        this.dataSource.data = [...this.employees];
+      }
+    });
   }
 
   ngAfterViewInit() {
