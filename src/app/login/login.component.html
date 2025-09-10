@@ -33,13 +33,19 @@
         Password is required.
       </div>
 
+      <!-- Error message display -->
+      <div class="error" *ngIf="errorMessage" style="color: #f44336; margin-top: 10px; text-align: center;">
+        {{ errorMessage }}
+      </div>
+
       <button
         type="submit"
         class="login-btn"
-        [disabled]="!loginForm.form.valid"
-        [class.disabled]="!loginForm.form.valid"
+        [disabled]="!isFormValid || isLoading"
+        [class.disabled]="!isFormValid || isLoading"
       >
-        Sign In
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading">Signing In...</span>
       </button>
     </form>
   </div>
