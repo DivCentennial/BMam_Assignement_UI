@@ -12,6 +12,10 @@ export class EmployeeService {
 
   constructor(private readonly http: HttpClient) {}
 
+  public getApiBaseUrl(): string {
+    return this.apiBaseUrl;
+  }
+
   public getEmployees(): Observable<EmployeePersonal[]> {
     // Create headers as required by your API (similar to login)
     const headers = new HttpHeaders({

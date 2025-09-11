@@ -166,6 +166,8 @@ export class MainpageComponent implements AfterViewInit, OnInit {
     this.employeeService.getEmployees().subscribe({
       next: (data: EmployeePersonal[]) => {
         console.log('Employee data loaded:', data);
+        console.log('Employee IDs from backend:', data.map(emp => ({ id: emp.employeeId, name: emp.fullName })));
+        console.log('Image URLs from backend:', data.map(emp => ({ id: emp.employeeId, imageUrl: emp.profileImageUrl })));
         // Convert backend data to table format
         this.employees = data.map((emp: EmployeePersonal) => ({
           id: emp.employeeId,
@@ -182,7 +184,7 @@ export class MainpageComponent implements AfterViewInit, OnInit {
           qualification: emp.qualification || '',
           experience: emp.experience,
           skills: emp.skill || '',
-          avatar: emp.profileImageUrl || undefined
+          avatar: this.convertImageUrl(emp.profileImageUrl, emp.employeeId)
         }));
         
         // Update the data source
@@ -556,7 +558,7 @@ export class MainpageComponent implements AfterViewInit, OnInit {
     qualification: employee.qualification || '',
     experience: employee.experience || 0,
     skills: employee.skills || '',
-    avatar: employee.avatar
+    avatar: employee.avatar // This is already converted in loadData
   };
 
   const dialogRef = this.dialog.open(EmployeeProfileDialogComponent, {
@@ -694,6 +696,34 @@ refreshData() {
         console.log('Default fallback to Male for:', gender);
         return 'Male'; // Default fallback
     }
+  }
+
+  // Helper method to convert image URL to proper format
+  private convertImageUrl(profileImageUrl: string | null, employeeId: number): string | undefined {
+    if (!profileImageUrl) return undefined;
+    
+    // If it's already a base64 data URL, return as is
+    if (profileImageUrl.startsWith('data:image/')) {
+      console.log('Image is already base64 data URL');
+      return profileImageUrl;
+    }
+    
+    // If employee ID is invalid (0 or negative), don't try to convert to API URL
+    if (!employeeId || employeeId <= 0) {
+      console.warn('Invalid employee ID for image conversion:', employeeId, 'Image URL:', profileImageUrl);
+      return undefined; // Return undefined to show placeholder instead
+    }
+    
+    // If it's a file path, convert to API URL
+    if (profileImageUrl.includes('\\') || profileImageUrl.includes('/')) {
+      const apiUrl = `${this.employeeService.getApiBaseUrl()}/api/Employee/${employeeId}/image`;
+      console.log('Converting file path to API URL:', profileImageUrl, '->', apiUrl);
+      return apiUrl;
+    }
+    
+    // If it's already a proper URL, return as is
+    console.log('Image URL is already proper format:', profileImageUrl);
+    return profileImageUrl;
   }
 
   // Helper method to ensure proper data types for API
