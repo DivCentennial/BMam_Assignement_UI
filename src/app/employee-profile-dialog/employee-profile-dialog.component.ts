@@ -95,7 +95,7 @@ export class EmployeeProfileDialogComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       gender: ['', [Validators.required]],
       dob: [null, [Validators.required]],
-      age: [{ value: '', disabled: true }],
+      age: [0],
       address: ['', [Validators.required, Validators.minLength(10)]],
       contactNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       email: ['', [Validators.required, Validators.email]]
@@ -112,11 +112,20 @@ export class EmployeeProfileDialogComponent implements OnInit {
 
   populateFormData(): void {
     if (this.data) {
+      // Calculate age from date of birth if available
+      let calculatedAge = this.data.age;
+      console.log('Dialog - Original age from data:', this.data.age);
+      console.log('Dialog - Date of birth:', this.data.dob);
+      if (this.data.dob) {
+        calculatedAge = this.calculateAge(this.data.dob);
+        console.log('Dialog - Calculated age from DOB:', calculatedAge);
+      }
+      
       this.personalForm.patchValue({
         name: this.data.name,
         gender: this.data.gender,
         dob: this.data.dob,
-        age: this.data.age,
+        age: calculatedAge,
         address: this.data.address,
         contactNumber: this.data.contactNumber,
         email: this.data.email
@@ -141,8 +150,10 @@ export class EmployeeProfileDialogComponent implements OnInit {
   }
 
   onDOBChange(event: MatDatepickerInputEvent<Date>): void {
+    console.log('Dialog - DOB changed:', event.value);
     if (event.value) {
       const age = this.calculateAge(event.value);
+      console.log('Dialog - Age calculated from DOB change:', age);
       this.personalForm.get('age')?.setValue(age);
     }
   }
@@ -308,11 +319,16 @@ export class EmployeeProfileDialogComponent implements OnInit {
     this.markFormGroupTouched(this.professionalForm);
 
     if (this.personalForm.valid && this.professionalForm.valid) {
+      console.log('Dialog - Personal form value:', this.personalForm.value);
+      console.log('Dialog - Professional form value:', this.professionalForm.value);
+      
       const employeeData: Employee = {
         ...this.personalForm.value,
         ...this.professionalForm.value,
         avatar: this.imagePreview
       };
+      
+      console.log('Dialog - Final employee data being returned:', employeeData);
 
       // Handle document upload
       if (this.selectedDocumentFile) {

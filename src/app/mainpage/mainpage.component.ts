@@ -450,13 +450,16 @@ export class MainpageComponent implements AfterViewInit, OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log('Add Employee Dialog result:', result);
+        console.log('Age from dialog:', result.age, 'Type:', typeof result.age);
+        
         // Prepare data for API call - All data in Personal object (as per EmployeePersonalEntity structure)
         const personalData = {
           EmployeeId: 0, // Will be set by the backend
           FullName: result.name || '',
           Gender: this.convertGenderToChar(result.gender),
           DOB: result.dob ? new Date(result.dob).toISOString() : new Date().toISOString(),
-          Age: result.age || null,
+          Age: result.age !== undefined && result.age !== null ? parseInt(result.age.toString()) : null,
           Address: result.address || '',
           ContactNo: result.contactNumber || '',
           Email: result.email || '',
@@ -535,12 +538,16 @@ export class MainpageComponent implements AfterViewInit, OnInit {
   }
 
  editEmployee(employee: TableEmployee) {
+  console.log('Original employee data:', employee);
+  console.log('Employee age:', employee.age, 'Type:', typeof employee.age);
+  console.log('Employee gender from DB:', employee.gender);
+  
   const employeeData: Employee = {
     id: employee.id,
     name: employee.name,
-    gender: employee.gender || '',
+    gender: this.convertCharToGender(employee.gender || ''),
     dob: employee.dob || null,
-    age: employee.age || 0,
+    age: employee.age !== undefined && employee.age !== null ? employee.age : 0,
     address: employee.address || '',
     contactNumber: employee.contactNumber || employee.contact,
     email: employee.email,
@@ -562,13 +569,16 @@ export class MainpageComponent implements AfterViewInit, OnInit {
 
   dialogRef.afterClosed().subscribe(result => {
     if (result) {
+      console.log('Dialog result:', result);
+      console.log('Age from dialog:', result.age, 'Type:', typeof result.age);
+      
       // Prepare data for API call - All data in Personal object (as per EmployeePersonalEntity structure)
       const personalData = {
         EmployeeId: employee.id,
         FullName: result.name || '',
         Gender: this.convertGenderToChar(result.gender),
         DOB: result.dob ? new Date(result.dob).toISOString() : new Date().toISOString(),
-        Age: result.age || null,
+        Age: result.age !== undefined && result.age !== null ? parseInt(result.age.toString()) : null,
         Address: result.address || '',
         ContactNo: result.contactNumber || '',
         Email: result.email || '',
@@ -666,6 +676,26 @@ refreshData() {
     }
   }
 
+  // Helper method to convert database gender format to dialog format
+  private convertCharToGender(gender: string): string {
+    console.log('Converting gender from DB format:', gender);
+    if (!gender) return 'Male'; // Default to Male
+    switch (gender.toUpperCase()) {
+      case 'M':
+        console.log('Converted M to Male');
+        return 'Male';
+      case 'F':
+        console.log('Converted F to Female');
+        return 'Female';
+      case 'O':
+        console.log('Converted O to Other');
+        return 'Other';
+      default:
+        console.log('Default fallback to Male for:', gender);
+        return 'Male'; // Default fallback
+    }
+  }
+
   // Helper method to ensure proper data types for API
   private sanitizeApiData(data: any): any {
     const sanitized = { ...data };
@@ -680,9 +710,20 @@ refreshData() {
       sanitized.Experience = parseFloat(sanitized.Experience.toString());
     }
     
-    // Ensure Age is a number or null
-    if (sanitized.Age !== null && sanitized.Age !== undefined) {
+    // Ensure Age is a number or null (handle 0 as valid value)
+    console.log('Age field processing:', { original: sanitized.Age, type: typeof sanitized.Age });
+    if (sanitized.Age !== null && sanitized.Age !== undefined && sanitized.Age !== '') {
       sanitized.Age = parseInt(sanitized.Age.toString());
+      // If parseInt returns NaN, set to null
+      if (isNaN(sanitized.Age)) {
+        console.warn('Age field is NaN, setting to null');
+        sanitized.Age = null;
+      } else {
+        console.log('Age field converted to:', sanitized.Age);
+      }
+    } else {
+      console.log('Age field is null/undefined/empty, setting to null');
+      sanitized.Age = null;
     }
     
     // Ensure UploadDocURL is not null (required field)
