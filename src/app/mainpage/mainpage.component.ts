@@ -170,8 +170,8 @@ export class MainpageComponent implements AfterViewInit, OnInit {
         this.employees = data.map((emp: EmployeePersonal) => ({
           id: emp.employeeId,
           name: emp.fullName,
-          designation: '', // Will be filled from professional data later
-          department: '',
+          designation: emp.designation || '', // Now from backend
+          department: emp.department || '', // Now from backend
           contact: emp.contactNo,
           email: emp.email || '',
           gender: emp.gender,
@@ -179,9 +179,9 @@ export class MainpageComponent implements AfterViewInit, OnInit {
           age: emp.age,
           address: emp.address,
           contactNumber: emp.contactNo,
-          qualification: '',
-          experience: undefined,
-          skills: '',
+          qualification: emp.qualification || '',
+          experience: emp.experience,
+          skills: emp.skill || '',
           avatar: emp.profileImageUrl || undefined
         }));
         
@@ -450,38 +450,85 @@ export class MainpageComponent implements AfterViewInit, OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Generate new ID
-        const newId = Math.max(...this.employees.map(e => e.id || 0)) + 1;
-        
-        // Convert Employee to TableEmployee format
-        const newEmployee: TableEmployee = {
-          id: newId,
-          name: result.name,
-          designation: result.designation,
-          department: result.department,
-          contact: result.contactNumber,
-          email: result.email,
-          contactNumber: result.contactNumber,
-          gender: result.gender,
-          dob: result.dob,
-          age: result.age,
-          address: result.address,
-          qualification: result.qualification,
-          experience: result.experience,
-          skills: result.skills,
-          avatar: result.avatar
+        // Prepare data for API call - All data in Personal object (as per EmployeePersonalEntity structure)
+        const personalData = {
+          EmployeeId: 0, // Will be set by the backend
+          FullName: result.name || '',
+          Gender: this.convertGenderToChar(result.gender),
+          DOB: result.dob ? new Date(result.dob).toISOString() : new Date().toISOString(),
+          Age: result.age || null,
+          Address: result.address || '',
+          ContactNo: result.contactNumber || '',
+          Email: result.email || '',
+          ProfileImageUrl: result.avatar || '',
+          // Professional fields (as per EmployeePersonalEntity structure)
+          Designation: result.designation || '',
+          Department: result.department || '',
+          Qualification: result.qualification || '',
+          Experience: result.experience ? parseFloat(result.experience.toString()) : null,
+          Skill: result.skills || '',
+          UploadDocURL: '' // Required field - provide empty string instead of null
         };
 
-        // Add to employees array
-        this.employees.push(newEmployee);
-        
-        // Refresh the data source
-        this.dataSource.data = [...this.employees];
-        
-        // Show success message
-        this.snackBar.open('Employee added successfully!', 'Close', { 
-          duration: 3000,
-          panelClass: ['success-snackbar']
+        // Minimal professional data (required by API structure)
+        const professionalData = {
+          EmployeeId: 0, // Will be set by the backend
+          Designation: result.designation || '',
+          Department: result.department || '',
+          Qualification: result.qualification || '',
+          Experience: result.experience ? parseFloat(result.experience.toString()) : null,
+          Skill: result.skills || ''
+        };
+
+        // Call the API to add the employee
+        this.employeeService.addEmployee(
+          this.sanitizeApiData(personalData), 
+          this.sanitizeApiData(professionalData)
+        ).subscribe({
+          next: (response) => {
+            // Generate new ID for local display (you might want to get this from the response)
+            const newId = Math.max(...this.employees.map(e => e.id || 0)) + 1;
+            
+            // Convert Employee to TableEmployee format
+            const newEmployee: TableEmployee = {
+              id: newId,
+              name: result.name,
+              designation: result.designation,
+              department: result.department,
+              contact: result.contactNumber,
+              email: result.email,
+              contactNumber: result.contactNumber,
+              gender: result.gender,
+              dob: result.dob,
+              age: result.age,
+              address: result.address,
+              qualification: result.qualification,
+              experience: result.experience,
+              skills: result.skills,
+              avatar: result.avatar
+            };
+
+            // Add to employees array only after successful API call
+            this.employees.push(newEmployee);
+            
+            // Refresh the data source
+            this.dataSource.data = [...this.employees];
+            
+            // Show success message
+            this.snackBar.open('Employee added successfully!', 'Close', { 
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+          },
+          error: (error) => {
+            console.error('Error adding employee:', error);
+            console.error('Error details:', error.error);
+            console.error('Validation errors:', error.error?.errors);
+            this.snackBar.open('Failed to add employee. Please try again.', 'Close', { 
+              duration: 3000,
+              panelClass: ['error-snackbar']
+            });
+          }
         });
       }
     });
@@ -515,33 +562,82 @@ export class MainpageComponent implements AfterViewInit, OnInit {
 
   dialogRef.afterClosed().subscribe(result => {
     if (result) {
-      const index = this.employees.findIndex(e => e.id === employee.id);
-      if (index > -1) {
-        const updatedEmployee: TableEmployee = {
-          ...this.employees[index],
-          name: result.name,
-          designation: result.designation,
-          department: result.department,
-          contact: result.contactNumber,
-          email: result.email,
-          contactNumber: result.contactNumber,
-          gender: result.gender,
-          dob: result.dob,
-          age: result.age,
-          address: result.address,
-          qualification: result.qualification,
-          experience: result.experience,
-          skills: result.skills,
-          avatar: result.avatar
-        };
+      // Prepare data for API call - All data in Personal object (as per EmployeePersonalEntity structure)
+      const personalData = {
+        EmployeeId: employee.id,
+        FullName: result.name || '',
+        Gender: this.convertGenderToChar(result.gender),
+        DOB: result.dob ? new Date(result.dob).toISOString() : new Date().toISOString(),
+        Age: result.age || null,
+        Address: result.address || '',
+        ContactNo: result.contactNumber || '',
+        Email: result.email || '',
+        ProfileImageUrl: result.avatar || '',
+        // Professional fields (as per EmployeePersonalEntity structure)
+        Designation: result.designation || '',
+        Department: result.department || '',
+        Qualification: result.qualification || '',
+        Experience: result.experience ? parseFloat(result.experience.toString()) : null,
+        Skill: result.skills || '',
+        UploadDocURL: '' // Required field - provide empty string instead of null
+      };
 
-        this.employees[index] = updatedEmployee;
-        this.refreshData(); // 👈 Call the correctly defined method
-        this.snackBar.open('Employee updated successfully!', 'Close', { 
-          duration: 3000,
-          panelClass: ['success-snackbar']
-        });
-      }
+      // Minimal professional data (required by API structure)
+      const professionalData = {
+        EmployeeId: employee.id,
+        Designation: result.designation || '',
+        Department: result.department || '',
+        Qualification: result.qualification || '',
+        Experience: result.experience ? parseFloat(result.experience.toString()) : null,
+        Skill: result.skills || ''
+      };
+
+      // Call the API to update the employee
+      this.employeeService.updateEmployee(
+        employee.id!, 
+        this.sanitizeApiData(personalData), 
+        this.sanitizeApiData(professionalData)
+      ).subscribe({
+        next: (response) => {
+          // Update local data only after successful API call
+          const index = this.employees.findIndex(e => e.id === employee.id);
+          if (index > -1) {
+            const updatedEmployee: TableEmployee = {
+              ...this.employees[index],
+              name: result.name,
+              designation: result.designation,
+              department: result.department,
+              contact: result.contactNumber,
+              email: result.email,
+              contactNumber: result.contactNumber,
+              gender: result.gender,
+              dob: result.dob,
+              age: result.age,
+              address: result.address,
+              qualification: result.qualification,
+              experience: result.experience,
+              skills: result.skills,
+              avatar: result.avatar
+            };
+
+            this.employees[index] = updatedEmployee;
+            this.refreshData();
+            this.snackBar.open('Employee updated successfully!', 'Close', { 
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error updating employee:', error);
+          console.error('Error details:', error.error);
+          console.error('Validation errors:', error.error?.errors);
+          this.snackBar.open('Failed to update employee. Please try again.', 'Close', { 
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
     }
   });
 }
@@ -555,17 +651,115 @@ refreshData() {
     this.dataSource.filter = this.searchText.trim().toLowerCase();
   }
 
+  // Helper method to convert gender string to char for backend
+  private convertGenderToChar(gender: string): string {
+    if (!gender) return 'M'; // Default to Male
+    switch (gender.toLowerCase()) {
+      case 'male':
+        return 'M';
+      case 'female':
+        return 'F';
+      case 'other':
+        return 'O';
+      default:
+        return 'M'; // Default fallback
+    }
+  }
+
+  // Helper method to ensure proper data types for API
+  private sanitizeApiData(data: any): any {
+    const sanitized = { ...data };
+    
+    // Ensure Gender is a single character
+    if (sanitized.Gender && typeof sanitized.Gender === 'string' && sanitized.Gender.length > 1) {
+      sanitized.Gender = this.convertGenderToChar(sanitized.Gender);
+    }
+    
+    // Ensure Experience is a number or null
+    if (sanitized.Experience !== null && sanitized.Experience !== undefined) {
+      sanitized.Experience = parseFloat(sanitized.Experience.toString());
+    }
+    
+    // Ensure Age is a number or null
+    if (sanitized.Age !== null && sanitized.Age !== undefined) {
+      sanitized.Age = parseInt(sanitized.Age.toString());
+    }
+    
+    // Ensure UploadDocURL is not null (required field)
+    if (sanitized.UploadDocURL === null || sanitized.UploadDocURL === undefined) {
+      sanitized.UploadDocURL = '';
+    }
+    
+    // Truncate string fields to prevent database truncation errors
+    // Common database column size limits (adjust as needed)
+    if (sanitized.FullName && sanitized.FullName.length > 100) {
+      console.warn(`FullName truncated from ${sanitized.FullName.length} to 100 characters`);
+      sanitized.FullName = sanitized.FullName.substring(0, 100);
+    }
+    if (sanitized.Address && sanitized.Address.length > 500) {
+      console.warn(`Address truncated from ${sanitized.Address.length} to 500 characters`);
+      sanitized.Address = sanitized.Address.substring(0, 500);
+    }
+    if (sanitized.Email && sanitized.Email.length > 100) {
+      console.warn(`Email truncated from ${sanitized.Email.length} to 100 characters`);
+      sanitized.Email = sanitized.Email.substring(0, 100);
+    }
+    if (sanitized.ContactNo && sanitized.ContactNo.length > 20) {
+      console.warn(`ContactNo truncated from ${sanitized.ContactNo.length} to 20 characters`);
+      sanitized.ContactNo = sanitized.ContactNo.substring(0, 20);
+    }
+    if (sanitized.Designation && sanitized.Designation.length > 100) {
+      console.warn(`Designation truncated from ${sanitized.Designation.length} to 100 characters`);
+      sanitized.Designation = sanitized.Designation.substring(0, 100);
+    }
+    if (sanitized.Department && sanitized.Department.length > 100) {
+      console.warn(`Department truncated from ${sanitized.Department.length} to 100 characters`);
+      sanitized.Department = sanitized.Department.substring(0, 100);
+    }
+    if (sanitized.Qualification && sanitized.Qualification.length > 200) {
+      console.warn(`Qualification truncated from ${sanitized.Qualification.length} to 200 characters`);
+      sanitized.Qualification = sanitized.Qualification.substring(0, 200);
+    }
+    if (sanitized.Skill && sanitized.Skill.length > 500) {
+      console.warn(`Skill truncated from ${sanitized.Skill.length} to 500 characters`);
+      sanitized.Skill = sanitized.Skill.substring(0, 500);
+    }
+    if (sanitized.ProfileImageUrl && sanitized.ProfileImageUrl.length > 500) {
+      console.warn(`ProfileImageUrl truncated from ${sanitized.ProfileImageUrl.length} to 500 characters`);
+      sanitized.ProfileImageUrl = sanitized.ProfileImageUrl.substring(0, 500);
+    }
+    if (sanitized.UploadDocURL && sanitized.UploadDocURL.length > 500) {
+      console.warn(`UploadDocURL truncated from ${sanitized.UploadDocURL.length} to 500 characters`);
+      sanitized.UploadDocURL = sanitized.UploadDocURL.substring(0, 500);
+    }
+    
+    return sanitized;
+  }
+
   deleteEmployee(emp: TableEmployee) {
     if (confirm(`Are you sure you want to delete '${emp.name}'?`)) {
-      const index = this.employees.indexOf(emp);
-      if (index > -1) {
-        this.employees.splice(index, 1);
-        this.dataSource.data = [...this.employees]; // Refresh dataSource
-        this.snackBar.open('Employee deleted successfully.', 'Close', { 
-          duration: 3000,
-          panelClass: ['success-snackbar']
-        });
-      }
+      // Call the API to delete the employee
+      this.employeeService.deleteEmployee(emp.id!).subscribe({
+        next: (response) => {
+          // Remove from local data only after successful API call
+          const index = this.employees.indexOf(emp);
+          if (index > -1) {
+            this.employees.splice(index, 1);
+            this.dataSource.data = [...this.employees]; // Refresh dataSource
+            this.snackBar.open('Employee deleted successfully.', 'Close', { 
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error deleting employee:', error);
+          this.snackBar.open('Failed to delete employee. Please try again.', 'Close', { 
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
     }
   }
 }

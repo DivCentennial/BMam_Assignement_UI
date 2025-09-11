@@ -24,6 +24,68 @@ export class EmployeeService {
     return this.http.get<EmployeePersonal[]>(`${this.apiBaseUrl}/api/Employee`, { headers });
   }
 
+  public addEmployee(personalData: any, professionalData: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'in_userid': this.getUserId(),
+      'pal-correlation-id': this.generateCorrelationId(),
+      'Content-Type': 'application/json',
+      'accept': 'application/json',
+      'X-Role': 'Admin' // Required for the create endpoint
+    });
+
+    const requestBody = {
+      Personal: personalData,
+      Professional: professionalData
+    };
+
+    console.log('Add Employee API Call:', {
+      url: `${this.apiBaseUrl}/api/Employee`,
+      headers: headers,
+      body: requestBody
+    });
+    console.log('Personal Data:', requestBody.Personal);
+    console.log('Professional Data:', requestBody.Professional);
+
+    return this.http.post(`${this.apiBaseUrl}/api/Employee`, requestBody, { headers });
+  }
+
+  public updateEmployee(employeeId: number, personalData: any, professionalData: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'in_userid': this.getUserId(),
+      'pal-correlation-id': this.generateCorrelationId(),
+      'Content-Type': 'application/json',
+      'accept': 'application/json',
+      'X-Role': 'Admin' // Required for the update endpoint
+    });
+
+    const requestBody = {
+      Personal: personalData,
+      Professional: professionalData
+    };
+
+    console.log('Update Employee API Call:', {
+      url: `${this.apiBaseUrl}/api/Employee/${employeeId}`,
+      headers: headers,
+      body: requestBody
+    });
+    console.log('Personal Data:', requestBody.Personal);
+    console.log('Professional Data:', requestBody.Professional);
+
+    return this.http.put(`${this.apiBaseUrl}/api/Employee/${employeeId}`, requestBody, { headers });
+  }
+
+  public deleteEmployee(employeeId: number): Observable<any> {
+    const headers = new HttpHeaders({
+      'in_userid': this.getUserId(),
+      'pal-correlation-id': this.generateCorrelationId(),
+      'Content-Type': 'application/json',
+      'accept': 'application/json',
+      'X-Role': 'Admin' // Required for the delete endpoint
+    });
+
+    return this.http.delete(`${this.apiBaseUrl}/api/Employee/${employeeId}`, { headers });
+  }
+
   private getUserId(): string {
     // Get user ID from localStorage (stored during login)
     return localStorage.getItem('userId') || '1';

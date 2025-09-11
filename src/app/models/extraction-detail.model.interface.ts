@@ -9,6 +9,13 @@ export interface EmployeePersonal {
   contactNo: string;
   email: string;
   profileImageUrl: string | null;
+  // Add these fields from EmployeeProfessional
+  designation?: string;
+  department?: string;
+  qualification?: string;
+  experience?: number; // Backend returns decimal, but we'll use number
+  skill?: string;
+  uploadDocURL?: string;
 }
 export interface EmployeeProfessional {
   employeeId: number;
