@@ -45,6 +45,27 @@ export class EmployeeService {
     });
     console.log('Personal Data:', requestBody.Personal);
     console.log('Professional Data:', requestBody.Professional);
+    
+    // Log field lengths to help debug truncation issues
+    console.log('Field Lengths - Personal:');
+    Object.keys(requestBody.Personal).forEach(key => {
+      const value = requestBody.Personal[key];
+      if (typeof value === 'string') {
+        console.log(`  ${key}: ${value.length} characters - "${value}"`);
+      } else {
+        console.log(`  ${key}: ${value} (${typeof value})`);
+      }
+    });
+    
+    console.log('Field Lengths - Professional:');
+    Object.keys(requestBody.Professional).forEach(key => {
+      const value = requestBody.Professional[key];
+      if (typeof value === 'string') {
+        console.log(`  ${key}: ${value.length} characters - "${value}"`);
+      } else {
+        console.log(`  ${key}: ${value} (${typeof value})`);
+      }
+    });
 
     return this.http.post(`${this.apiBaseUrl}/api/Employee`, requestBody, { headers });
   }
@@ -70,6 +91,27 @@ export class EmployeeService {
     });
     console.log('Personal Data:', requestBody.Personal);
     console.log('Professional Data:', requestBody.Professional);
+    
+    // Log field lengths to help debug truncation issues
+    console.log('Field Lengths - Personal:');
+    Object.keys(requestBody.Personal).forEach(key => {
+      const value = requestBody.Personal[key];
+      if (typeof value === 'string') {
+        console.log(`  ${key}: ${value.length} characters - "${value}"`);
+      } else {
+        console.log(`  ${key}: ${value} (${typeof value})`);
+      }
+    });
+    
+    console.log('Field Lengths - Professional:');
+    Object.keys(requestBody.Professional).forEach(key => {
+      const value = requestBody.Professional[key];
+      if (typeof value === 'string') {
+        console.log(`  ${key}: ${value.length} characters - "${value}"`);
+      } else {
+        console.log(`  ${key}: ${value} (${typeof value})`);
+      }
+    });
 
     return this.http.put(`${this.apiBaseUrl}/api/Employee/${employeeId}`, requestBody, { headers });
   }

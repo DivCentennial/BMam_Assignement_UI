@@ -691,14 +691,14 @@ refreshData() {
     }
     
     // Truncate string fields to prevent database truncation errors
-    // Common database column size limits (adjust as needed)
-    if (sanitized.FullName && sanitized.FullName.length > 100) {
-      console.warn(`FullName truncated from ${sanitized.FullName.length} to 100 characters`);
-      sanitized.FullName = sanitized.FullName.substring(0, 100);
+    // Based on actual database schema
+    if (sanitized.FullName && sanitized.FullName.length > 50) {
+      console.warn(`FullName truncated from ${sanitized.FullName.length} to 50 characters`);
+      sanitized.FullName = sanitized.FullName.substring(0, 50);
     }
-    if (sanitized.Address && sanitized.Address.length > 500) {
-      console.warn(`Address truncated from ${sanitized.Address.length} to 500 characters`);
-      sanitized.Address = sanitized.Address.substring(0, 500);
+    if (sanitized.Address && sanitized.Address.length > 100) {
+      console.warn(`Address truncated from ${sanitized.Address.length} to 100 characters`);
+      sanitized.Address = sanitized.Address.substring(0, 100);
     }
     if (sanitized.Email && sanitized.Email.length > 100) {
       console.warn(`Email truncated from ${sanitized.Email.length} to 100 characters`);
@@ -708,29 +708,29 @@ refreshData() {
       console.warn(`ContactNo truncated from ${sanitized.ContactNo.length} to 20 characters`);
       sanitized.ContactNo = sanitized.ContactNo.substring(0, 20);
     }
-    if (sanitized.Designation && sanitized.Designation.length > 100) {
-      console.warn(`Designation truncated from ${sanitized.Designation.length} to 100 characters`);
-      sanitized.Designation = sanitized.Designation.substring(0, 100);
+    if (sanitized.Designation && sanitized.Designation.length > 200) {
+      console.warn(`Designation truncated from ${sanitized.Designation.length} to 200 characters`);
+      sanitized.Designation = sanitized.Designation.substring(0, 200);
     }
-    if (sanitized.Department && sanitized.Department.length > 100) {
-      console.warn(`Department truncated from ${sanitized.Department.length} to 100 characters`);
-      sanitized.Department = sanitized.Department.substring(0, 100);
+    if (sanitized.Department && sanitized.Department.length > 200) {
+      console.warn(`Department truncated from ${sanitized.Department.length} to 200 characters`);
+      sanitized.Department = sanitized.Department.substring(0, 200);
     }
-    if (sanitized.Qualification && sanitized.Qualification.length > 200) {
-      console.warn(`Qualification truncated from ${sanitized.Qualification.length} to 200 characters`);
-      sanitized.Qualification = sanitized.Qualification.substring(0, 200);
+    if (sanitized.Qualification && sanitized.Qualification.length > 400) {
+      console.warn(`Qualification truncated from ${sanitized.Qualification.length} to 400 characters`);
+      sanitized.Qualification = sanitized.Qualification.substring(0, 400);
     }
-    if (sanitized.Skill && sanitized.Skill.length > 500) {
-      console.warn(`Skill truncated from ${sanitized.Skill.length} to 500 characters`);
-      sanitized.Skill = sanitized.Skill.substring(0, 500);
+    if (sanitized.Skill && sanitized.Skill.length > 2000) {
+      console.warn(`Skill truncated from ${sanitized.Skill.length} to 2000 characters`);
+      sanitized.Skill = sanitized.Skill.substring(0, 2000);
     }
-    if (sanitized.ProfileImageUrl && sanitized.ProfileImageUrl.length > 500) {
-      console.warn(`ProfileImageUrl truncated from ${sanitized.ProfileImageUrl.length} to 500 characters`);
-      sanitized.ProfileImageUrl = sanitized.ProfileImageUrl.substring(0, 500);
+    if (sanitized.ProfileImageUrl && sanitized.ProfileImageUrl.length > 400) {
+      console.warn(`ProfileImageUrl truncated from ${sanitized.ProfileImageUrl.length} to 400 characters`);
+      sanitized.ProfileImageUrl = sanitized.ProfileImageUrl.substring(0, 400);
     }
-    if (sanitized.UploadDocURL && sanitized.UploadDocURL.length > 500) {
-      console.warn(`UploadDocURL truncated from ${sanitized.UploadDocURL.length} to 500 characters`);
-      sanitized.UploadDocURL = sanitized.UploadDocURL.substring(0, 500);
+    if (sanitized.UploadDocURL && sanitized.UploadDocURL.length > 1000) {
+      console.warn(`UploadDocURL truncated from ${sanitized.UploadDocURL.length} to 1000 characters`);
+      sanitized.UploadDocURL = sanitized.UploadDocURL.substring(0, 1000);
     }
     
     return sanitized;
